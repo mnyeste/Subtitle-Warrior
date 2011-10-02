@@ -20,32 +20,69 @@ public class TextFrameTest {
         long fromStamp = 1;
         long toStamp = 2;
 
-        TextFrame frame = new TextFrame(fromStamp, toStamp);
+        TextFrame frame = new TextFrame(fromStamp, toStamp, "Text");
 
         Assert.assertEquals(fromStamp, frame.getFromStamp());
         Assert.assertEquals(toStamp, frame.getToStamp());
 
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testIncorrectStamps() {
 
-        long fromStamp = 2;
-        long toStamp = 1;
+        // Testing from should be < than to
+        
+        try {
 
-        TextFrame frame = new TextFrame(fromStamp, toStamp);
+            long fromStamp = 2;
+            long toStamp = 1;
+
+            new TextFrame(fromStamp, toStamp, "Text");
+
+            Assert.fail();
+
+        } catch (IllegalArgumentException exception) {
+            // Pass
+        }
+        
+        // Testing for negative values
+
+        try {
+
+            long fromStamp = Long.MIN_VALUE;
+            long toStamp = Long.MIN_VALUE + 1;
+
+            new TextFrame(fromStamp, toStamp, "Text");
+
+            Assert.fail();
+
+        } catch (IllegalArgumentException exception) {
+            // Pass
+        }
 
     }
-    // TODO: order should be a static counter???
 
+    @Test
+    public void testTextIsCorrect() {
+        TextFrame frame = new TextFrame(0, 1, "Text");
+
+        Assert.assertEquals("Text", frame.getText());
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testInCorrectText() {
+        TextFrame frame = new TextFrame(0, 1, null);
+    }
+
+    // TODO: order should be a static counter???
     @Test
     public void testOrderCounter() {
 
         long fromStamp = 1;
         long toStamp = 2;
 
-        TextFrame frame1 = new TextFrame(fromStamp, toStamp);
-        TextFrame frame2 = new TextFrame(fromStamp, toStamp);
+        TextFrame frame1 = new TextFrame(fromStamp, toStamp, "Text");
+        TextFrame frame2 = new TextFrame(fromStamp, toStamp, "Text");
 
         Assert.assertEquals(1, frame1.getOrder());
         Assert.assertEquals(2, frame2.getOrder());
@@ -58,13 +95,13 @@ public class TextFrameTest {
         // Original
         Assert.assertEquals(1, TextFrame.getOrderCounter());
 
-        new TextFrame(1, 2);
-        
+        new TextFrame(1, 2, "Text");
+
         // After creating a frame
         Assert.assertEquals(2, TextFrame.getOrderCounter());
-        
+
         TextFrame.reset();
-        
+
         // After reset
         Assert.assertEquals(1, TextFrame.getOrderCounter());
 

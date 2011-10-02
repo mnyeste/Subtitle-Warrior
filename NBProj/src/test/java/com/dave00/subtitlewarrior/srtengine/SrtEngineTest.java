@@ -2,7 +2,6 @@ package com.dave00.subtitlewarrior.srtengine;
 
 import com.dave00.subtitlewarrior.model.TextFrame;
 import com.dave00.subtitlewarrior.model.TextFrameList;
-import com.dave00.subtitlewarrior.srtengine.SrtEngine;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.Assert;
@@ -18,10 +17,12 @@ public class SrtEngineTest {
     public void testLoadFromFile() {
 
         String fileName = "The Simpsons 01x06 - Moaning Lisa.srt";
+        // String fileName = "Cut.srt";
 
         TextFrameList frameList = SrtEngine.loadFromFile(fileName);
 
         Assert.assertEquals(216, frameList.getFrameCount());
+        // Assert.assertEquals(3, frameList.getFrameCount());
 
     }
 
@@ -34,6 +35,7 @@ public class SrtEngineTest {
         textList.add("00:00:02,100 --> 00:00:05,600");
         textList.add("Szoveg 1 soros");
         textList.add("");
+        textList.add(""); // Intentional duplication of empty line
         textList.add("2");
         textList.add("00:01:42,800 --> 00:01:50,100");
         textList.add("Szoveg 2 soros");
@@ -52,4 +54,5 @@ public class SrtEngineTest {
         Assert.assertEquals(49328654, stamp);                
         
     }
+    
 }

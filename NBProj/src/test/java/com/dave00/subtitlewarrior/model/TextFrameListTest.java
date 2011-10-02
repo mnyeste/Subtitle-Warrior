@@ -11,8 +11,8 @@ public class TextFrameListTest {
     public void testInit() {
         
         List<TextFrame> list = new ArrayList<TextFrame>();
-        list.add(new TextFrame(0, 1));
-        list.add(new TextFrame(2, 3));
+        list.add(new TextFrame(0, 1, "Text"));
+        list.add(new TextFrame(2, 3, "Text"));
         
         TextFrameList frameList = new TextFrameList(list);
         

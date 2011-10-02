@@ -6,6 +6,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -83,18 +84,28 @@ public class SrtEngine {
 
         ReadMode mode = ReadMode.READ_ORDER;
 
-        int order;
-        long fromStamp;
-        long toStamp;
+        long fromStamp = Long.MIN_VALUE;
+        long toStamp = Long.MIN_VALUE;
+        String text = null;
 
-        for (String line : textList) {
+        Iterator<String> iterator = textList.iterator();
+
+        while (iterator.hasNext()) {
 
             // TODO: update to Java 7?
+
+            String line = iterator.next();
+
+            System.out.println(line);
+
+            // Safety check for unneeded duplication of empty lines between frames
+            if (line.isEmpty() && mode != ReadMode.READ_TEXT) {
+                continue;
+            }
 
             switch (mode) {
 
                 case READ_ORDER: {
-                    order = Integer.parseInt(line);
                     mode = ReadMode.READ_TIME;
                     break;
                 }
@@ -107,10 +118,10 @@ public class SrtEngine {
 
                     fromStamp = convertToStamp(hourFrom, minuteFrom, secondFrom, millisFrom);
 
-                    int hourTo = Integer.parseInt(line.substring(0, 2));
-                    int minuteTo = Integer.parseInt(line.substring(3, 5));
-                    int secondTo = Integer.parseInt(line.substring(6, 8));
-                    int millisTo = Integer.parseInt(line.substring(9, 12));
+                    int hourTo = Integer.parseInt(line.substring(17, 19));
+                    int minuteTo = Integer.parseInt(line.substring(20, 22));
+                    int secondTo = Integer.parseInt(line.substring(23, 25));
+                    int millisTo = Integer.parseInt(line.substring(26, 29));
 
                     toStamp = convertToStamp(hourTo, minuteTo, secondTo, millisTo);
 
@@ -118,26 +129,33 @@ public class SrtEngine {
                     break;
                 }
                 case READ_TEXT: {
-                    
+
                     // TODO: TextFrame needs text field
-                    
+
+                    if (text == null) {
+                        text = line;
+                    } else {
+                        text += "\n" + line;
+                    }
+
+                    if (line.isEmpty() || !iterator.hasNext()) {
+
+                        TextFrame textFrame = new TextFrame(fromStamp, toStamp, text);
+                        list.add(textFrame);
+
+                        text = null;
+                        mode = ReadMode.READ_ORDER;
+
+                        break;
+
+                    }
+
                     break;
                 }
 
             }
 
         }
-
-        /*
-        textList.add("1");
-        textList.add("00:00:02,100 --> 00:00:05,600");
-        textList.add("Szoveg 1 soros");
-        textList.add("");
-        textList.add("2");
-        textList.add("00:01:42,800 --> 00:01:50,100");
-        textList.add("Szoveg 2 soros");
-        textList.add("Szoveg 2 soros");
-         */
 
         return list;
 
