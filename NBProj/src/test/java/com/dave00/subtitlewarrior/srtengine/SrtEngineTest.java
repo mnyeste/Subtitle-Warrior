@@ -19,7 +19,9 @@ public class SrtEngineTest {
         String fileName = "The Simpsons 01x06 - Moaning Lisa.srt";
         // String fileName = "Cut.srt";
 
-        TextFrameList frameList = SrtEngine.loadFromFile(fileName);
+        SrtEngine.loadFromFile(fileName);
+        
+        TextFrameList frameList = SrtEngine.getFrameList();
 
         Assert.assertEquals(216, frameList.getFrameCount());
         // Assert.assertEquals(3, frameList.getFrameCount());
@@ -48,10 +50,68 @@ public class SrtEngineTest {
 
     @Test
     public void testConvertToStamp() {
-        
+
         // 13:42:08:654 = 654 + (8*1000) + (42 * 1000 * 60) + (13 * 1000 * 60 * 60) = 49328654
         long stamp = SrtEngine.convertToStamp(13, 42, 8, 654);
-        Assert.assertEquals(49328654, stamp);                
+        Assert.assertEquals(49328654, stamp);
+
+    }
+
+    @Test
+    public void testSubscribe() {
+
+        SrtDisplayer disp1 = new SrtDisplayer() {
+
+            public void display(String text) {
+            }
+        };
+
+        SrtDisplayer disp2 = new SrtDisplayer() {
+
+            public void display(String text) {
+            }
+        };
+
+        SrtEngine.subscribe(disp1);
+        SrtEngine.subscribe(disp2);
+
+        Assert.assertEquals(2, SrtEngine.getSubscribers().size());
+
+    }
+
+    /**
+     * In this test we show that the @{code SrtEngine} is calling back the subscribed
+     * members to 'display' actual text
+     */
+    @Test
+    public void testPlayCallBackCount() {
+
+        SrtEngine.loadFromFile("PlayTest.srt");
+
+        // TODO: implement displayer with counter
+        // TODO: play
+        // TODO: assert count hit display method
+
+        WatchableSrtDisplayer displayer = new WatchableSrtDisplayer();
+        
+        SrtEngine.subscribe(displayer);
+        
+        SrtEngine.play();
+        
+        Assert.assertEquals(3, displayer.counter); 
+
+
+    }
+    
+    class WatchableSrtDisplayer implements SrtDisplayer
+    {
+        
+        int counter;
+        
+        public void display(String text)
+        {
+            counter++;
+        }
         
     }
     

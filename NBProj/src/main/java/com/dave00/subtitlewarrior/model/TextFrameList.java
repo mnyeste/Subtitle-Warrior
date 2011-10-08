@@ -23,4 +23,9 @@ public class TextFrameList {
         return list.size();
     }
     
+    public List<TextFrame> getList()
+    {
+        return list;
+    }
+    
 }

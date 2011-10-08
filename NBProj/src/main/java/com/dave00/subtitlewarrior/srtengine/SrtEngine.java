@@ -8,6 +8,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
+import java.util.HashSet;
 
 /**
  * Responsible for loading the @{code TextFrame}s from the given .srt file
@@ -16,17 +18,43 @@ import java.util.List;
  * @author dave00
  */
 public class SrtEngine {
+    
+    // TODO: deal with synchronization
+    // Using set to avoid duplicate registration
+    private static Set<SrtDisplayer> subscribers = new HashSet<SrtDisplayer>();
+    private static TextFrameList frameList;
 
-    public static TextFrameList loadFromFile(String fileName) {
+    public static void loadFromFile(String fileName) {
 
         List<String> textList = readFileToBuffer(fileName);
 
-        final List<TextFrame> list = parseTextList(textList);
+        List<TextFrame> list = parseTextList(textList);
 
-        TextFrameList frameList = new TextFrameList(list);
+        frameList  = new TextFrameList(list);
 
-        return frameList;
-
+    }
+    
+    public static void play()
+    {
+        
+        for (TextFrame frame : frameList.getList())
+        {
+            
+            // TODO: maybe use event type
+            notifySubscribers(frame);
+            
+        }
+        
+    }
+    
+    private static void notifySubscribers(TextFrame frame)
+    {
+        
+        for (SrtDisplayer displayer : subscribers)
+        {
+            displayer.display(frame.getText());
+        }
+        
     }
 
     private static List<String> readFileToBuffer(String fileName) {
@@ -160,4 +188,20 @@ public class SrtEngine {
         return list;
 
     }
+    
+    public static void subscribe(SrtDisplayer displayer)
+    {
+        subscribers.add(displayer);
+    }
+    
+    public static TextFrameList getFrameList()
+    {
+        return frameList;
+    }
+    
+    static Set<SrtDisplayer> getSubscribers()
+    {
+        return subscribers;
+    }
+    
 }
