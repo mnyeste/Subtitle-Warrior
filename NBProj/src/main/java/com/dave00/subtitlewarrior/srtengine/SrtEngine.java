@@ -8,8 +8,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
-import java.util.HashSet;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * Responsible for loading the @{code TextFrame}s from the given .srt file
@@ -18,11 +18,10 @@ import java.util.HashSet;
  * @author dave00
  */
 public class SrtEngine {
-    
-    // TODO: deal with synchronization
-    // Using set to avoid duplicate registration
-    private static Set<SrtDisplayer> subscribers = new HashSet<SrtDisplayer>();
+
+    private static SrtDisplayer subscriber;
     private static TextFrameList frameList;
+    private static Timer timer = new Timer();
 
     public static void loadFromFile(String fileName) {
 
@@ -30,31 +29,63 @@ public class SrtEngine {
 
         List<TextFrame> list = parseTextList(textList);
 
-        frameList  = new TextFrameList(list);
+        frameList = new TextFrameList(list);
 
     }
-    
-    public static void play()
-    {
-        
-        for (TextFrame frame : frameList.getList())
-        {
-            
-            // TODO: maybe use event type
-            notifySubscribers(frame);
-            
-        }
-        
+
+    public static void play() {
+
+        SrtEngine.playScheduled(0, true, 0);
+
     }
-    
-    private static void notifySubscribers(TextFrame frame)
-    {
-        
-        for (SrtDisplayer displayer : subscribers)
-        {
-            displayer.display(frame.getText());
+
+    private static void playScheduled(final int index, boolean emptyScreen, final long delay) {
+
+        final TextFrame frame = frameList.getList().get(index);
+
+        long clearDel;
+
+        if (index == 0) {
+            clearDel = 0;
+        } else {
+            TextFrame lastFrame = frameList.getList().get(index - 1);
+            clearDel = lastFrame.getToStamp() - lastFrame.getFromStamp();
         }
-        
+
+        final long clearDelay = clearDel;
+
+        if (emptyScreen) {
+
+            timer.schedule(new TimerTask() {
+
+                @Override
+                public void run() {
+                    subscriber.clear();
+                    playScheduled(index, false, clearDelay + delay);
+                }
+                // How long will see the text displayed before it gets cleared    
+            }, clearDelay);
+        } else {
+
+            timer.schedule(new TimerTask() {
+
+                @Override
+                public void run() {
+                    subscriber.display(frame.getText());
+
+                    // If not last frame
+                    if (index < frameList.getList().size() - 1) {
+                        playScheduled(index + 1, true, frame.getFromStamp());
+                    } else {
+                        timer.cancel();
+                    }
+
+                }
+                // How long will see empty screen before text gets displayed
+            }, frame.getFromStamp() - delay);
+        }
+
+
     }
 
     private static List<String> readFileToBuffer(String fileName) {
@@ -124,8 +155,6 @@ public class SrtEngine {
 
             String line = iterator.next();
 
-            System.out.println(line);
-
             // Safety check for unneeded duplication of empty lines between frames
             if (line.isEmpty() && mode != ReadMode.READ_TEXT) {
                 continue;
@@ -188,20 +217,12 @@ public class SrtEngine {
         return list;
 
     }
-    
-    public static void subscribe(SrtDisplayer displayer)
-    {
-        subscribers.add(displayer);
+
+    public static void subscribe(SrtDisplayer displayer) {
+        subscriber = displayer;
     }
-    
-    public static TextFrameList getFrameList()
-    {
+
+    public static TextFrameList getFrameList() {
         return frameList;
     }
-    
-    static Set<SrtDisplayer> getSubscribers()
-    {
-        return subscribers;
-    }
-    
 }

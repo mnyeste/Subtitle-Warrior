@@ -5,6 +5,7 @@ import com.dave00.subtitlewarrior.model.TextFrameList;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -20,7 +21,7 @@ public class SrtEngineTest {
         // String fileName = "Cut.srt";
 
         SrtEngine.loadFromFile(fileName);
-        
+
         TextFrameList frameList = SrtEngine.getFrameList();
 
         Assert.assertEquals(216, frameList.getFrameCount());
@@ -57,62 +58,25 @@ public class SrtEngineTest {
 
     }
 
-    @Test
-    public void testSubscribe() {
-
-        SrtDisplayer disp1 = new SrtDisplayer() {
-
-            public void display(String text) {
-            }
-        };
-
-        SrtDisplayer disp2 = new SrtDisplayer() {
-
-            public void display(String text) {
-            }
-        };
-
-        SrtEngine.subscribe(disp1);
-        SrtEngine.subscribe(disp2);
-
-        Assert.assertEquals(2, SrtEngine.getSubscribers().size());
-
-    }
-
     /**
      * In this test we show that the @{code SrtEngine} is calling back the subscribed
      * members to 'display' actual text
      */
+    @Ignore
     @Test
     public void testPlayCallBackCount() {
 
         SrtEngine.loadFromFile("PlayTest.srt");
 
-        // TODO: implement displayer with counter
-        // TODO: play
-        // TODO: assert count hit display method
-
         WatchableSrtDisplayer displayer = new WatchableSrtDisplayer();
-        
+
         SrtEngine.subscribe(displayer);
-        
+
         SrtEngine.play();
-        
-        Assert.assertEquals(3, displayer.counter); 
+
+        Assert.assertEquals(3, displayer.counter);
 
 
-    }
-    
-    class WatchableSrtDisplayer implements SrtDisplayer
-    {
-        
-        int counter;
-        
-        public void display(String text)
-        {
-            counter++;
-        }
-        
     }
     
 }

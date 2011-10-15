@@ -11,4 +11,9 @@ public interface SrtDisplayer {
      */ 
     void display(String text);
     
+    /**
+     * Shows empty screen (no text to display)
+     */
+    void clear();
+    
 }

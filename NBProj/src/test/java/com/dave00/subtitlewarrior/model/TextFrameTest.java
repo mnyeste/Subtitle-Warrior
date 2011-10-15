@@ -31,7 +31,7 @@ public class TextFrameTest {
     public void testIncorrectStamps() {
 
         // Testing from should be < than to
-        
+
         try {
 
             long fromStamp = 2;
@@ -44,7 +44,7 @@ public class TextFrameTest {
         } catch (IllegalArgumentException exception) {
             // Pass
         }
-        
+
         // Testing for negative values
 
         try {
@@ -59,6 +59,24 @@ public class TextFrameTest {
         } catch (IllegalArgumentException exception) {
             // Pass
         }
+
+    }
+
+    @Test
+    public void testActiveStamps() {
+
+        long fromStamp = 5321;
+        long toStamp = 6543;
+
+        TextFrame textFrame = new TextFrame(fromStamp, toStamp, "Text");
+
+        long currentTimeMillis = 4000;
+
+        long activeFromStamp = textFrame.getFromStamp(currentTimeMillis);
+        long activeToStamp = textFrame.getToStamp(currentTimeMillis);
+
+        Assert.assertEquals(activeFromStamp, fromStamp - currentTimeMillis);
+        Assert.assertEquals(activeToStamp, toStamp - currentTimeMillis);
 
     }
 
