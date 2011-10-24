@@ -1,11 +1,11 @@
 1
 00:00:01,000 --> 00:00:03,000
-Szoveg1
+Kicsit dolgoztam most mar a GUI-n is.
 
 2
 00:00:05,000 --> 00:00:07,000
-Szoveg2
+Na persze epp csak annyit h feldobtam egy frame-re egy panelt.
 
 3
 00:00:10,000 --> 00:00:14,000
-Szoveg3
+Egyelore ennyi.

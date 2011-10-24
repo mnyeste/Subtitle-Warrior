@@ -92,7 +92,6 @@ public class TextFrameTest {
         TextFrame frame = new TextFrame(0, 1, null);
     }
 
-    // TODO: order should be a static counter???
     @Test
     public void testOrderCounter() {
 

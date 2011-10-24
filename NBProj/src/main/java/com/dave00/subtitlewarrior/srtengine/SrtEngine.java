@@ -187,8 +187,6 @@ public class SrtEngine {
                 }
                 case READ_TEXT: {
 
-                    // TODO: TextFrame needs text field
-
                     if (text == null) {
                         text = line;
                     } else {
